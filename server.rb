@@ -5,6 +5,7 @@ require 'pry'
 require './db/setup'
 require './lib/all'
 require 'haversine'
+require 'httparty'
 
 class TransportApp < Sinatra::Base
 
@@ -34,21 +35,21 @@ class TransportApp < Sinatra::Base
 
   get "/train_info/:station"  do
     query_station  = params[:station]
-    station_info   = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/{All}", query: { api_key: "d311c928b8364eff80d7462f7938b2b1" })
+    binding.pry
+    station_info   = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/'All'", query: { api_key: "d311c928b8364eff80d7462f7938b2b1" })
     destination    = station_info["DestinationName"]
     line_color     = station_info["Line"]
     time_to_depart = station_info["Min"]
     final_information = {destination: destination, line_color: line_color, time_to_depart: time_to_depart}
-    binding.pry
 
   end
 
   get "/closest_bike" do
-
+    
   end
 
   get "bike_info" do
-
+    
   end
 end
 

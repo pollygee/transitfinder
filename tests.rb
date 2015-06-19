@@ -27,8 +27,7 @@ class TransportTest < Minitest::Test
 
   def test_getiting_train_station_info
     get "/train_info/A03"
-
-    assert_eqaual 200, last_response.status
+    assert_equal 200, last_response.status
     assert last_response.body.include?('Dupont Circle')
     assert last_response.body.include?('Shady Grove')
   end
