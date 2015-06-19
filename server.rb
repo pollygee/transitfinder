@@ -18,13 +18,18 @@ class TransportApp < Sinatra::Base
     user_lat =  params["lat"].to_f
 
     all_trains = Train.all
-    # trains_and_distance = {}
-    # all_trains.each do |train|
-    #   distance_to_user = how_far(user_long, user_lat, train.longitude, train.latitude)
-    #   trains_and_distance[train] = distance_to_user
-    # end
-    # binding.pry
-    # return trains_and_distance
+    trains_and_distance = {}
+    all_trains.each do |train|
+      distance_to_user = how_far(user_long, user_lat, train.longitude, train.latitude)
+      trains_and_distance[train] = distance_to_user
+    end
+    sorted_list = trains_and_distance.sort_by {|train, distance| distance}
+    winner_list = []
+    winner_list << sorted_list.shift
+    winner_list << sorted_list.shift
+    winner_list << sorted_list.shift
+    winner_list.to_json
+
   end
 
   get "/train_info"  do
@@ -38,8 +43,6 @@ class TransportApp < Sinatra::Base
   get "bike_info" do
 
   end
-
-
 end
 
 if $0 == __FILE__
