@@ -16,7 +16,7 @@ class TransportTest < Minitest::Test
   end
 
   def test_getting_closest_3_stations
-    get "/closest_train",
+    get "/train",
       lat: "38.9059620",
       long: "-77.0423670"
     assert_equal 200, last_response.status
