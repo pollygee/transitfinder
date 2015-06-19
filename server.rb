@@ -24,7 +24,8 @@ class TransportApp < Sinatra::Base
   end
 
   def train_station_info station_code
-    HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{station_code}", query: { api_key: "d311c928b8364eff80d7462f7938b2b1" })
+    token = File.read "./token"
+    HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{token}", query: { api_key: "d311c928b8364eff80d7462f7938b2b1" })
   end
   
   get "/train" do
@@ -48,6 +49,10 @@ class TransportApp < Sinatra::Base
       upcoming_trains[:next_train] = station_info
     end
     final = close_train_list.to_json
+  end
+
+  get "/bikes" do
+
   end
 end
 
