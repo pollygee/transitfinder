@@ -51,8 +51,24 @@ class TransportApp < Sinatra::Base
     final = close_train_list.to_json
   end
 
-  get "/bikes" do
-
+  get "/bike" do
+    user_long = params["long"].to_f
+    user_lat =  params["lat"].to_f
+    #all_bike_stations = Bike.all
+    live_bike_data = HTTParty.get("http://www.capitalbikeshare.com/data/stations/bikeStations.xml", query: { api_key: "d311c928b8364eff80d7462f7938b2b1" })
+    all_stations_with_distance = []
+    all_bike_stations = live_bike_data["stations"]["station"]
+    all_bike_stations.each do |station|
+      station_long = station["long"].to_f
+      station_lat = station["lat"].to_f
+      dist_to_station = how_far(user_long, user_lat, station_long, station_lat)
+      station_with_distance = {station_name: station["name"], 
+                              bikes_available: station["nbBikes"],
+                              empty_docks: station["nbEmptyDocks"]}
+      all_stations_with_distance << station_with_distance
+    end
+    binding.pry
+    all_stations_with_distance
   end
 end
 
