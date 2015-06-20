@@ -64,11 +64,13 @@ class TransportApp < Sinatra::Base
       dist_to_station = how_far(user_long, user_lat, station_long, station_lat)
       station_with_distance = {station_name: station["name"], 
                               bikes_available: station["nbBikes"],
-                              empty_docks: station["nbEmptyDocks"]}
+                              empty_docks: station["nbEmptyDocks"],
+                              distance: dist_to_station}
       all_stations_with_distance << station_with_distance
     end
+    sorted_list = all_stations_with_distance.sort_by {|hsh| hsh[:distance]}
+    sorted_list.first(3)
     binding.pry
-    all_stations_with_distance
   end
 end
 
