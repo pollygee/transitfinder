@@ -12,6 +12,10 @@ class TransportApp < Sinatra::Base
     headers["Content-Type"] = "application/json"
   end
 
+  after do
+    ActiveRecord::Base.connection.close
+  end
+
   use Rack::Cors do
     allow do
       origins '*'
@@ -27,6 +31,7 @@ class TransportApp < Sinatra::Base
   end
 
   def train_station_info station_code
+    @token = File.read "./token.txt"
     @station_info = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{station_code}", query: { api_key: "#{@token}" })
   end
   
@@ -46,11 +51,12 @@ class TransportApp < Sinatra::Base
     close_train_list= sorted_list.first(3)
 
     full_station_info = sorted_list.first(3)
-    close_train_list.each do |upcoming_trains|
+    close_train_list.each do |station|
       #station_info   = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{station_code}", query: { api_key: "#{token}" })      
-      upcoming_trains[:next_train] = train_station_info upcoming_train
+      station[:next_train] = train_station_info station["code"]
     end
     final = close_train_list.to_json
+
   end
 
   get "/bike" do
@@ -72,6 +78,7 @@ class TransportApp < Sinatra::Base
     end
     sorted_list = all_stations_with_distance.sort_by {|hsh| hsh[:distance]}
     sorted_list.first(3).to_json
+    binding.pry
   end
 
   get "/bus" do
@@ -86,13 +93,15 @@ class TransportApp < Sinatra::Base
       station_long = station["Lon"].to_f
       station_lat = station["Lat"].to_f
       dist_to_station = how_far(user_long, user_lat, station_long, station_lat)
+      bus_predictions = HTTParty.get("https://api.wmata.com/NextBusService.svc/json/jPredictions/?StopID=#{station["StopID"]}", query: {api_key: "#{@token}" })
       station_with_distance = { station_name: station["Name"],
                                 routes: station["Routes"],
-                                stop_id: station["StopID"]}
+                                stop_id: station["StopID"],
+                                predictions: bus_predictions["Predictions"]}
       all_stations_with_distance << station_with_distance
     end
     sorted_list = all_stations_with_distance.sort_by {|hsh| hsh[:distance]}
-    sorted_list.first(3).to_json
+    t = sorted_list.first(3).to_json
   end
 
 
