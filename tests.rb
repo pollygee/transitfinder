@@ -25,15 +25,12 @@ class TransportTest < Minitest::Test
     assert last_response.body.include?('Farragut North')
   end
 
-  def test_getiting_train_station_info
-    get "/train"
-    assert_equal 200, last_response.status
-    assert last_response.body.include?('Dupont Circle')
-    assert last_response.body.include?('Shady Grove')
-  end
-
   def test_bike_info
-    get "/bike"
+    get "/bike",
+      lat: "38.9059620",
+      long: "-77.0423670"
     assert_equal 200, last_response.status
+    assert last_response.body.include?('Dupon')
+
   end
 end

@@ -25,7 +25,7 @@ class TransportApp < Sinatra::Base
 
   def train_station_info station_code
     token = File.read "./token"
-    HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{token}", query: { api_key: "d311c928b8364eff80d7462f7938b2b1" })
+    @station_info = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{station_code}", query: { api_key: "#{token}" })
   end
   
   get "/train" do
@@ -45,8 +45,8 @@ class TransportApp < Sinatra::Base
 
     full_station_info = sorted_list.first(3)
     close_train_list.each do |upcoming_trains|
-      station_info   = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{upcoming_trains["code"]}", query: { api_key: "d311c928b8364eff80d7462f7938b2b1" })      
-      upcoming_trains[:next_train] = station_info
+      #station_info   = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{station_code}", query: { api_key: "#{token}" })      
+      upcoming_trains[:next_train] = @station_info
     end
     final = close_train_list.to_json
   end
@@ -55,7 +55,7 @@ class TransportApp < Sinatra::Base
     user_long = params["long"].to_f
     user_lat =  params["lat"].to_f
     #all_bike_stations = Bike.all
-    live_bike_data = HTTParty.get("http://www.capitalbikeshare.com/data/stations/bikeStations.xml", query: { api_key: "d311c928b8364eff80d7462f7938b2b1" })
+    live_bike_data = HTTParty.get("http://www.capitalbikeshare.com/data/stations/bikeStations.xml", query: { api_key: "token" })
     all_stations_with_distance = []
     all_bike_stations = live_bike_data["stations"]["station"]
     all_bike_stations.each do |station|
