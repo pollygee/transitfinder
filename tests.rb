@@ -16,7 +16,7 @@ class TransportTest < Minitest::Test
   end
 
   def test_train_getting_closest_3_stations
-    skip
+    
     get "/train",
       lat: "38.9059620",
       long: "-77.0423670"
@@ -53,6 +53,7 @@ class TransportTest < Minitest::Test
   end
 
   def test_bus_info
+    skip
     get "/bus",
       lat: "38.9059620",
       long: "-77.0423670"
