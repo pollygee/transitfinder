@@ -30,7 +30,13 @@ class TransportTest < Minitest::Test
       lat: "38.9059620",
       long: "-77.0423670"
     assert_equal 200, last_response.status
-    assert last_response.body.include?('Dupon')
+    assert last_response.body.include?('Dupont')
+  end
 
+  def test_bus_info
+    get "/bus",
+      lat: "38.9059620",
+      long: "-77.0423670"
+    assert_equal 200, last_response.status
   end
 end
