@@ -69,8 +69,7 @@ class TransportApp < Sinatra::Base
       all_stations_with_distance << station_with_distance
     end
     sorted_list = all_stations_with_distance.sort_by {|hsh| hsh[:distance]}
-    sorted_list.first(3)
-    binding.pry
+    sorted_list.first(3).to_json
   end
 end
 
