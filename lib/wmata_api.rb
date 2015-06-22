@@ -3,26 +3,35 @@ require 'json'
 require 'pry'
 
 class WmataAPI
-  @token = File.read "./token.txt"
-  def how_far a_long, a_lat, b_long, b_lat
-    dis = Haversine.distance(a_long, a_lat, b_long, b_lat)
-    dis.to_miles
-  end
 
   def train_station_info station_code
+    @token = File.read "./token.txt"
     @station_info = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{station_code}", query: { api_key: "#{@token}" })
+  end
+
+
+  def bus_w_distances user_long, user_lat
+    @token = File.read "./token.txt"
+    bus_info= HTTParty.get("https://api.wmata.com/Bus.svc/json/jStops?long=#{user_long}&lat=#{user_lat}&1000&api_key=#{@token}")
+    all_buses = bus_info["Stops"]
+    all_buses.min_by(3){|bus| distance_to(user_long, user_lat, bus["Lat"], bus["Lon"] )}
+  end
+
+  def bus_predictions list
+    list.each do |station|
+    bus_prediction = HTTParty.get("https://api.wmata.com/NextBusService.svc/json/jPredictions/?StopID=#{station["StopID"]}", query: {api_key: "#{@token}" })
+    station[:prediction] = bus_prediction["Predictions"]
+    end
+    list.to_json
+  end
+
+  def distance_to user_long, user_lat, long, lat
+    Haversine.distance(user_long, user_lat, long, lat).to_miles
   end
 
   def trains_w_distances user_long, user_lat
     all_trains = Train.all
-    trains_and_distance = []
-    all_trains.each do |train|
-      train_info = train.attributes
-      distance_to_user = how_far(user_long, user_lat, train.longitude, train.latitude)
-      train_info[:distance] = distance_to_user
-      trains_and_distance << train_info
-    end
-    trains_and_distance
+    all_trains.min_by(3){|train| distance_to(user_long, user_lat, train.longitude, train.latitude)}
   end
 
   def sorted_3 list
@@ -32,12 +41,18 @@ class WmataAPI
 
   def trains_live_data three_trains
     three_trains.each do |station|
-      #station_info   = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{station_code}", query: { api_key: "#{token}" })      
-      station[:next_train] = train_station_info station["code"]
+      station_info = station.attributes
+      station_info[:next_train] = (train_station_info station["code"])
     end
     three_trains.to_json
   end
 
+  def bike_w_distances user_long, user_lat
+    bike_data = HTTParty.get("http://www.capitalbikeshare.com/data/stations/bikeStations.xml", query: { api_key: "#{@token}" })
+    all_bikes = bike_data["stations"]["station"]
+    sorted = all_bikes.min_by(3){|bike| distance_to(user_long, user_lat, bike['long'].to_f, bike['lat'].to_f)}
+    sorted.to_json
+  end
 end
 
 
