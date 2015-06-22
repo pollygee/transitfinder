@@ -1,7 +1,10 @@
-:shipit:
+:shipit: 
+
 This app will find the closest public transportation to a user.  It takes in the location as a parameter and uses endpoints /train, /bus, /bike.
 
+
 /train will return:
+```
       [  {
         id: 
         name: 
@@ -21,10 +24,12 @@ This app will find the closest public transportation to a user.  It takes in the
           LocationName: 
           Min: }
           ] 
-        },
+        }
+```
 Trains will usually have multiple next_trains.
 
 /bus will return:
+```
   {StopName:,
   Predictions:
   [
@@ -36,13 +41,14 @@ Trains will usually have multiple next_trains.
       VehicleID: 
       TripID: 
       },}
+```
 
 /bike will return capital bikeshare data:
-
+```
       {
       station_name: 
       bikes_available: 
       empty_docks: 
       distance: 
       }
-
+```
