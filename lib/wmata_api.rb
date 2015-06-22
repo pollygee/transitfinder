@@ -34,11 +34,6 @@ class WmataAPI
     all_trains.min_by(3){|train| distance_to(user_long, user_lat, train.longitude, train.latitude)}
   end
 
-  def sorted_3 list
-    sorted = list.sort_by {|hsh| hsh[:distance]}
-    sorted.first(3)
-  end
-
   def trains_live_data three_trains
     three_trains.each do |station|
       station_info = station.attributes
