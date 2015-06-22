@@ -28,7 +28,8 @@ class TransportApp < Sinatra::Base
     user_lat =  params["lat"].to_f
     t = WmataAPI.new 
     list = t.trains_w_distances user_long, user_lat
-    t.trains_live_data list
+    
+    t.trains_live_data(t.sorted_3 list)
   end
 
   get "/bus" do

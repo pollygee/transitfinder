@@ -9,6 +9,10 @@ class WmataAPI
     @station_info = HTTParty.get("https://api.wmata.com/StationPrediction.svc/json/GetPrediction/#{station_code}", query: { api_key: "#{@token}" })
   end
 
+  def sorted_3 list    
+    sorted = list.sort_by {|hsh| hsh[:distance]}   
+    sorted.first(3)    
+  end
 
   def bus_w_distances user_long, user_lat
     @token = File.read "./token.txt"
@@ -35,11 +39,10 @@ class WmataAPI
   end
 
   def trains_live_data three_trains
-    three_trains.each do |station|
-      station_info = station.attributes
-      station_info[:next_train] = (train_station_info station["code"])
-    end
-    three_trains.to_json
+
+    three_trains.map do |station|
+      station.attribues.merge(next_train:  (train_station_info station["code"]))
+    end.to_json
   end
 
   def bike_w_distances user_long, user_lat
